@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Med Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 min-h-screen p-4 md:p-6 text-slate-900">
+  <div class="max-w-6xl mx-auto">
+    <section id="loginPage" class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 md:p-10">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 items-center">
+        <div>
+          <div class="w-16 h-16 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-3xl mb-5">💊</div>
+          <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Med Control</h1>
+          <p class="text-slate-600 mt-4 text-lg max-w-xl">
+            Organize medicamentos, consulte bulas resumidas e receba alertas de interação medicamentosa.
+          </p>
+        </div>
+
+        <div class="border border-slate-200 rounded-lg p-5">
+          <div class="grid grid-cols-2 gap-2 bg-slate-100 rounded-lg p-1 mb-5">
+            <button id="tabEntrar" onclick="trocarAbaLogin('entrar')" class="py-2 rounded-md font-semibold bg-white shadow-sm">Entrar</button>
+            <button id="tabCriar" onclick="trocarAbaLogin('criar')" class="py-2 rounded-md font-semibold text-slate-600">Criar conta</button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm text-slate-600 font-medium">E-mail</label>
+              <input id="loginEmail" type="email" placeholder="seu@email.com" class="w-full mt-2 p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+            </div>
+
+            <div>
+              <label class="text-sm text-slate-600 font-medium">Senha</label>
+              <input id="loginSenha" type="password" placeholder="Digite sua senha" class="w-full mt-2 p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+            </div>
+
+            <p id="loginMensagem" class="hidden text-sm rounded-lg p-3"></p>
+
+            <button id="loginSubmit" onclick="entrarDemo()" class="w-full bg-emerald-700 text-white px-5 py-3 rounded-lg font-semibold hover:bg-emerald-800 transition">
+              Entrar
+            </button>
+
+            <button onclick="entrarGov()" class="w-full border border-slate-300 px-5 py-3 rounded-lg font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-3">
+              <img src="gov.png" alt="gov.br" class="h-7 max-w-[90px] object-contain">
+              Entrar com gov.br
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="appPages" class="hidden grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
+      <aside class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
+          <div class="w-11 h-11 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-2xl">💊</div>
+          <div>
+            <h1 class="text-2xl font-bold">Med Control</h1>
+            <p class="text-sm text-slate-500">Modo demonstração</p>
+          </div>
+        </div>
+
+        <button onclick="mudarPagina('medicamentos')" class="menu-btn bg-slate-100 rounded-lg p-4 text-left hover:bg-slate-200 transition">
+          <span class="font-semibold">Meus Medicamentos</span>
+          <span class="block text-sm text-slate-500 mt-1">Lista e alertas.</span>
+        </button>
+
+        <button onclick="mudarPagina('cadastro')" class="menu-btn bg-slate-100 rounded-lg p-4 text-left hover:bg-slate-200 transition">
+          <span class="font-semibold">Adicionar Medicamento</span>
+          <span class="block text-sm text-slate-500 mt-1">Cadastro com sugestões.</span>
+        </button>
+
+        <button onclick="mudarPagina('busca')" class="menu-btn bg-slate-100 rounded-lg p-4 text-left hover:bg-slate-200 transition">
+          <span class="font-semibold">Buscar Bula</span>
+          <span class="block text-sm text-slate-500 mt-1">Resumo pré-programado.</span>
+        </button>
+
+        <button onclick="mudarPagina('scanner')" class="menu-btn bg-slate-100 rounded-lg p-4 text-left hover:bg-slate-200 transition">
+          <span class="font-semibold">Escanear Caixa</span>
+          <span class="block text-sm text-slate-500 mt-1">Simulação de câmera.</span>
+        </button>
+
+        <button onclick="sair()" class="mt-auto border border-slate-300 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-50 transition">
+          Sair
+        </button>
+      </aside>
+
+      <main class="flex flex-col gap-5">
+        <section id="cadastroPage" class="hidden bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6">
+          <h2 class="text-2xl font-bold mb-5">Cadastro de Medicamentos</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="relative">
+              <label class="text-sm text-slate-600 font-medium">Nome do remédio</label>
+              <input id="nome" type="text" placeholder="Ex: Losartana" oninput="mostrarSugestoesCadastro()" autocomplete="off" class="w-full mt-2 p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+              <div id="sugestoesCadastro" class="hidden absolute z-20 left-0 right-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden"></div>
+            </div>
+
+            <div>
+              <label class="text-sm text-slate-600 font-medium">Dose</label>
+              <input id="dose" type="text" placeholder="Ex: 50mg" class="w-full mt-2 p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="text-sm text-slate-600 font-medium">Aprazamento de horário</label>
+            <input id="horario" type="text" placeholder="Ex: 08:00 / 12:00 / 20:00" class="w-full mt-2 p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+          </div>
+
+          <div id="medicamentoSelecionado" class="hidden mt-4 border border-emerald-200 bg-emerald-50 rounded-lg p-4"></div>
+
+          <p id="erroCadastro" class="hidden mt-4 bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm"></p>
+
+          <div id="sucesso" class="hidden mt-5 bg-green-50 border border-green-200 text-green-700 rounded-lg p-4">
+            <strong>Medicamento salvo.</strong>
+          </div>
+
+          <button onclick="adicionarMedicamento()" class="mt-5 bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-800 transition">
+            Salvar Medicamento
+          </button>
+        </section>
+
+        <section id="buscaPage" class="hidden bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6">
+          <div class="flex flex-col md:flex-row md:items-end gap-3 mb-5">
+            <div class="flex-1">
+              <label class="text-sm text-slate-600 font-medium">Buscar resumo de bula</label>
+              <input id="buscaBula" type="text" placeholder="Digite Losartana, Metformina ou Ibuprofeno" class="w-full mt-2 p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+            </div>
+            <button onclick="buscarBula()" class="bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-800 transition">
+              Buscar
+            </button>
+          </div>
+
+          <div id="resultadoBusca" class="border border-dashed border-slate-300 rounded-lg p-5 text-slate-500">
+            Pesquise um medicamento para ver foto da caixa e bula resumida.
+          </div>
+        </section>
+
+        <section id="medicamentosPage" class="hidden bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+            <div>
+              <h2 class="text-2xl font-bold">Medicamentos Cadastrados</h2>
+              <p id="statusInteracoes" class="text-sm text-slate-500 mt-1">Interações serão avaliadas ao adicionar medicamentos.</p>
+            </div>
+            <span id="contador" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium w-fit">0 cadastrados</span>
+          </div>
+
+          <div id="alertasInteracao" class="hidden mb-5 flex flex-col gap-3"></div>
+          <div id="listaMedicamentos" class="flex flex-col gap-4"></div>
+        </section>
+
+        <section id="scannerPage" class="hidden bg-white rounded-lg shadow-sm border border-slate-200 p-5 md:p-6">
+          <h2 class="text-2xl font-bold mb-4">Escanear Remédio</h2>
+          <div class="border-2 border-dashed border-slate-300 rounded-lg p-8 flex flex-col items-center justify-center text-center">
+            <div class="w-20 h-20 rounded-lg bg-slate-100 flex items-center justify-center text-4xl">📷</div>
+            <h3 class="text-xl font-semibold mt-4">Escaneie a caixa do medicamento</h3>
+            <p class="text-slate-500 mt-2 max-w-md">Protótipo visual. A identificação por câmera pode ser conectada depois.</p>
+            <button onclick="simularScanner()" class="mt-5 bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-800 transition">
+              Abrir Câmera
+            </button>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <div id="modalExcluir" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full text-center">
+      <div class="text-5xl mb-4">⚠️</div>
+      <h2 class="text-2xl font-bold">Confirmar Exclusão</h2>
+      <p class="text-slate-500 mt-3">Deseja realmente excluir este medicamento?</p>
+      <div class="flex gap-3 mt-6">
+        <button onclick="confirmarExclusao()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition">Sim</button>
+        <button onclick="fecharModal()" class="flex-1 bg-slate-200 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-300 transition">Não</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const catalogo = [
+      {
+        nome: 'Losartana',
+        dosePadrao: '50mg',
+        imagem: 'LOSARTANA.png',
+        bula: {
+          indicacao: 'tratamento da pressão alta e proteção dos rins em alguns pacientes diabéticos.',
+          acao: 'relaxa os vasos sanguíneos, facilitando a circulação do sangue e reduzindo a pressão arterial.',
+          uso: 'via oral, conforme prescrição médica.',
+          efeitos: 'tontura, dor de cabeça e cansaço.',
+          contraindicacao: 'alergia ao medicamento e gravidez.',
+          cuidados: 'acompanhar a pressão arterial e seguir a orientação médica.'
+        }
+      },
+      {
+        nome: 'Metformina',
+        dosePadrao: '500mg',
+        imagem: 'METFORMINA.png',
+        bula: {
+          indicacao: 'tratamento do diabetes tipo 2.',
+          acao: 'reduz a produção de glicose pelo fígado e melhora a ação da insulina.',
+          uso: 'via oral, conforme PRESCRIÇÃO MÉDICA.',
+          efeitos: 'náuseas, diarreia, dor abdominal e perda de apetite.',
+          contraindicacao: 'insuficiência renal grave e alergia ao medicamento.',
+          cuidados: 'tomar conforme orientação médica e manter acompanhamento dos níveis de glicose.'
+        }
+      },
+      {
+        nome: 'Ibuprofeno',
+        dosePadrao: '400mg',
+        imagem: 'IBUPROFENO.png',
+        bula: {
+          indicacao: 'alívio da dor, febre e inflamações.',
+          acao: 'reduz a produção de substâncias que causam dor e inflamação.',
+          uso: 'via oral, conforme orientação médica ou da bula.',
+          efeitos: 'dor de estômago, azia, náuseas e tontura.',
+          contraindicacao: 'alergia ao ibuprofeno, úlcera gástrica ativa e insuficiência renal grave.',
+          cuidados: 'evitar uso prolongado sem orientação médica e tomar preferencialmente após as refeições.'
+        }
+      }
+    ];
+
+    let loginModo = 'entrar';
+    let medicamentos = [
+      { nome: 'Losartana', dose: '50mg', horario: '08:00 / 20:00' }
+    ];
+    let interacoes = [];
+    let indexExcluir = null;
+
+    function escapeHtml(valor) {
+      return String(valor)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function normalizar(valor) {
+      return String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+
+    function medicamentoCatalogo(nome) {
+      const alvo = normalizar(nome);
+      return catalogo.find((item) => normalizar(item.nome) === alvo);
+    }
+
+    function trocarAbaLogin(modo) {
+      loginModo = modo;
+      document.getElementById('tabEntrar').className = modo === 'entrar'
+        ? 'py-2 rounded-md font-semibold bg-white shadow-sm'
+        : 'py-2 rounded-md font-semibold text-slate-600';
+      document.getElementById('tabCriar').className = modo === 'criar'
+        ? 'py-2 rounded-md font-semibold bg-white shadow-sm'
+        : 'py-2 rounded-md font-semibold text-slate-600';
+      document.getElementById('loginSubmit').innerText = modo === 'entrar' ? 'Entrar' : 'Criar conta';
+      ocultarMensagemLogin();
+    }
+
+    function mostrarMensagemLogin(texto, erro = false) {
+      const mensagem = document.getElementById('loginMensagem');
+      mensagem.innerText = texto;
+      mensagem.className = erro
+        ? 'text-sm rounded-lg p-3 bg-red-50 text-red-700 border border-red-200'
+        : 'text-sm rounded-lg p-3 bg-emerald-50 text-emerald-700 border border-emerald-200';
+    }
+
+    function ocultarMensagemLogin() {
+      const mensagem = document.getElementById('loginMensagem');
+      mensagem.className = 'hidden text-sm rounded-lg p-3';
+      mensagem.innerText = '';
+    }
+
+    function entrarDemo() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const senha = document.getElementById('loginSenha').value.trim();
+      if (!email || !senha) {
+        mostrarMensagemLogin('Preencha e-mail e senha para acessar.', true);
+        return;
+      }
+      mostrarMensagemLogin(loginModo === 'criar' ? 'Conta criada em modo demonstração.' : 'Login realizado em modo demonstração.');
+      setTimeout(abrirApp, 450);
+    }
+
+    function entrarGov() {
+      mostrarMensagemLogin('Entrada gov.br simulada para este protótipo.');
+      setTimeout(abrirApp, 450);
+    }
+
+    function abrirApp() {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('appPages').classList.remove('hidden');
+      mudarPagina('medicamentos');
+    }
+
+    function sair() {
+      document.getElementById('appPages').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+    }
+
+    function mudarPagina(pagina) {
+      ['cadastroPage', 'medicamentosPage', 'buscaPage', 'scannerPage'].forEach((id) => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(`${pagina}Page`).classList.remove('hidden');
+      if (pagina === 'medicamentos') {
+        renderizarMedicamentos();
+      }
+    }
+
+    function mostrarSugestoesCadastro() {
+      const termo = normalizar(document.getElementById('nome').value);
+      const box = document.getElementById('sugestoesCadastro');
+      if (!termo) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+      }
+
+      const resultados = catalogo.filter((item) => normalizar(item.nome).includes(termo));
+      if (!resultados.length) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+      }
+
+      box.innerHTML = resultados.map((item) => `
+        <button type="button" onclick="selecionarMedicamento('${escapeHtml(item.nome)}')" class="w-full flex items-center gap-3 p-3 hover:bg-slate-50 text-left">
+          <img src="${item.imagem}" alt="${escapeHtml(item.nome)}" class="w-20 h-12 object-contain bg-slate-50 rounded-md border border-slate-100">
+          <span class="font-semibold">${escapeHtml(item.nome)}</span>
+        </button>
+      `).join('');
+      box.classList.remove('hidden');
+    }
+
+    function selecionarMedicamento(nome) {
+      const item = medicamentoCatalogo(nome);
+      if (!item) return;
+      document.getElementById('nome').value = item.nome;
+      document.getElementById('dose').value = item.dosePadrao;
+      document.getElementById('sugestoesCadastro').classList.add('hidden');
+      document.getElementById('medicamentoSelecionado').innerHTML = cardResumoBula(item, false);
+      document.getElementById('medicamentoSelecionado').classList.remove('hidden');
+    }
+
+    function adicionarMedicamento() {
+      const nome = document.getElementById('nome').value.trim();
+      const dose = document.getElementById('dose').value.trim();
+      const horario = document.getElementById('horario').value.trim();
+      const erro = document.getElementById('erroCadastro');
+
+      erro.classList.add('hidden');
+      if (!nome || !dose || !horario) {
+        erro.innerText = 'Preencha nome, dose e horário.';
+        erro.classList.remove('hidden');
+        return;
+      }
+
+      medicamentos.unshift({ nome, dose, horario });
+      document.getElementById('nome').value = '';
+      document.getElementById('dose').value = '';
+      document.getElementById('horario').value = '';
+      document.getElementById('medicamentoSelecionado').classList.add('hidden');
+
+      document.getElementById('sucesso').classList.remove('hidden');
+      avaliarInteracoes();
+      setTimeout(() => {
+        document.getElementById('sucesso').classList.add('hidden');
+        mudarPagina('medicamentos');
+      }, 800);
+    }
+
+    function buscarBula() {
+      const termo = normalizar(document.getElementById('buscaBula').value);
+      const resultado = document.getElementById('resultadoBusca');
+      const item = catalogo.find((medicamento) => normalizar(medicamento.nome).includes(termo));
+
+      if (!termo || !item) {
+        resultado.className = 'border border-red-200 bg-red-50 rounded-lg p-5 text-red-700';
+        resultado.innerText = 'Medicamento não encontrado no catálogo pré-programado.';
+        return;
+      }
+
+      resultado.className = 'border border-slate-200 rounded-lg p-5';
+      resultado.innerHTML = `
+        ${cardResumoBula(item, true)}
+        <button onclick="prepararCadastro('${escapeHtml(item.nome)}')" class="mt-4 bg-emerald-700 text-white px-5 py-3 rounded-lg font-semibold hover:bg-emerald-800 transition">
+          Adicionar este medicamento
+        </button>
+      `;
+    }
+
+    function prepararCadastro(nome) {
+      selecionarMedicamento(nome);
+      mudarPagina('cadastro');
+      document.getElementById('nome').value = nome;
+    }
+
+    function cardResumoBula(item, completo) {
+      const alerta = normalizar(item.nome) === 'losartana' || normalizar(item.nome) === 'ibuprofeno'
+        ? '<div class="mt-3 bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 font-semibold">AVISO: interação medicamentosa possível entre Losartana e Ibuprofeno.</div>'
+        : '';
+
+      return `
+        <div class="flex flex-col md:flex-row gap-4">
+          <img src="${item.imagem}" alt="${escapeHtml(item.nome)}" class="w-36 h-24 object-contain bg-white rounded-lg border border-slate-200">
+          <div class="flex-1">
+            <h3 class="text-xl font-bold">${escapeHtml(item.nome)}</h3>
+            <div class="mt-2 text-sm text-slate-700 space-y-1">
+              <p><strong>Indicação:</strong> ${item.bula.indicacao}</p>
+              <p><strong>Ação:</strong> ${item.bula.acao}</p>
+              <p><strong>Uso:</strong> ${item.bula.uso}</p>
+              ${completo ? `<p><strong>Efeitos comuns:</strong> ${item.bula.efeitos}</p>` : ''}
+              ${completo ? `<p><strong>Contraindicação:</strong> ${item.bula.contraindicacao}</p>` : ''}
+              <p><strong>Cuidados:</strong> ${item.bula.cuidados}</p>
+            </div>
+            ${alerta}
+          </div>
+        </div>
+      `;
+    }
+
+    function emojiHorario(horario) {
+      const match = String(horario).match(/(\d{1,2}):(\d{2})/);
+      if (!match) return `⏰ ${escapeHtml(horario)}`;
+      const hora = Number(match[1]);
+      if (hora >= 5 && hora <= 10) return `☀️ ${escapeHtml(horario)}`;
+      if (hora >= 11 && hora <= 14) return `🍽️ ${escapeHtml(horario)}`;
+      if (hora >= 15 && hora <= 18) return `🌤️ ${escapeHtml(horario)}`;
+      return `🌙 ${escapeHtml(horario)}`;
+    }
+
+    function formatarHorarios(horario) {
+      return String(horario)
+        .split('/')
+        .map((parte) => emojiHorario(parte.trim()))
+        .join(' <span class="text-slate-300">/</span> ');
+    }
+
+    function renderizarMedicamentos() {
+      const lista = document.getElementById('listaMedicamentos');
+      const contador = document.getElementById('contador');
+      contador.innerText = `${medicamentos.length} cadastrados`;
+
+      if (!medicamentos.length) {
+        lista.innerHTML = '<div class="border border-dashed border-slate-300 rounded-lg p-5 text-slate-500">Nenhum medicamento cadastrado.</div>';
+      } else {
+        lista.innerHTML = medicamentos.map((medicamento, index) => {
+          const item = medicamentoCatalogo(medicamento.nome);
+          const imagem = item ? `<img src="${item.imagem}" alt="${escapeHtml(item.nome)}" class="w-24 h-16 object-contain bg-white rounded-lg border border-slate-200">` : '<div class="w-24 h-16 rounded-lg bg-slate-100 flex items-center justify-center text-2xl">💊</div>';
+          return `
+            <article class="relative border border-slate-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <button onclick="abrirModal(${index})" class="absolute top-3 right-3 w-8 h-8 rounded-md bg-red-50 text-red-600 font-bold hover:bg-red-100 transition" aria-label="Excluir medicamento">×</button>
+              <div class="flex items-center gap-4 pr-10">
+                ${imagem}
+                <div>
+                  <h3 class="text-lg font-bold">${escapeHtml(medicamento.nome)}</h3>
+                  <p class="text-slate-500">Dose: ${escapeHtml(medicamento.dose)}</p>
+                </div>
+              </div>
+              <div class="bg-slate-100 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 md:max-w-xs">
+                ${formatarHorarios(medicamento.horario)}
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      renderizarAlertas();
+    }
+
+    function regraLocalInteracoes() {
+      const nomes = medicamentos.map((medicamento) => normalizar(medicamento.nome));
+      if (nomes.includes('losartana') && nomes.includes('ibuprofeno')) {
+        return [{
+          medicamentos: ['Losartana', 'Ibuprofeno'],
+          risco: 'alto',
+          mensagem: 'Losartana e Ibuprofeno podem ter interação medicamentosa. Consulte um profissional de saúde.'
+        }];
+      }
+      return [];
+    }
+
+    function avaliarInteracoes() {
+      const status = document.getElementById('statusInteracoes');
+      status.innerText = 'Avaliando interações medicamentosas...';
+      interacoes = regraLocalInteracoes();
+      status.innerText = interacoes.length
+        ? 'Interações avaliadas por regra pré-programada.'
+        : 'Nenhuma interação medicamentosa encontrada.';
+      renderizarAlertas();
+    }
+
+    function renderizarAlertas() {
+      const container = document.getElementById('alertasInteracao');
+      if (!interacoes.length) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = interacoes.map((interacao) => `
+        <div class="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4">
+          <strong>AVISO DE INTERAÇÃO MEDICAMENTOSA</strong>
+          <p class="mt-1">${escapeHtml(interacao.mensagem || 'Consulte um profissional de saúde antes de combinar estes medicamentos.')}</p>
+          <p class="text-sm mt-2"><strong>Medicamentos:</strong> ${escapeHtml((interacao.medicamentos || []).join(' + '))}</p>
+        </div>
+      `).join('');
+      container.classList.remove('hidden');
+    }
+
+    function abrirModal(index) {
+      indexExcluir = index;
+      document.getElementById('modalExcluir').classList.remove('hidden');
+    }
+
+    function fecharModal() {
+      document.getElementById('modalExcluir').classList.add('hidden');
+    }
+
+    function confirmarExclusao() {
+      medicamentos.splice(indexExcluir, 1);
+      fecharModal();
+      avaliarInteracoes();
+      renderizarMedicamentos();
+    }
+
+    function simularScanner() {
+      prepararCadastro('Losartana');
+      document.getElementById('horario').value = '08:00 / 20:00';
+    }
+
+    renderizarMedicamentos();
+    avaliarInteracoes();
+  </script>
+</body>
+</html>
