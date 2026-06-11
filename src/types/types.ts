@@ -20,9 +20,11 @@ export interface Leaflet {
   indicacao: string
   acao: string
   uso: string
-  efeitos: string
-  contraindicacao: string
-  cuidados: string
+  efeitos?: string
+  contraindicacao?: string
+  cuidados?: string
+  inicioAcao?: string
+  duracao?: string
 }
 
 export interface CatalogMedication {

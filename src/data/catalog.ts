@@ -21,10 +21,35 @@ export const catalogo: CatalogMedication[] = [
     bula: {
       indicacao: 'tratamento do diabetes tipo 2.',
       acao: 'reduz a produção de glicose pelo fígado e melhora a ação da insulina.',
-      uso: 'via oral, conforme prescrição médica.',
-      efeitos: 'náuseas, diarreia, dor abdominal e perda de apetite.',
+      uso: 'via oral, geralmente junto às refeições.',
+      efeitos: 'náuseas, diarreia, dor abdominal e gases.',
       contraindicacao: 'insuficiência renal grave e alergia ao medicamento.',
-      cuidados: 'tomar conforme orientação médica e manter acompanhamento dos níveis de glicose.',
+    },
+  },
+  {
+    nome: 'Captopril',
+    dosePadrao: '',
+    imagem: '/CAPTOPRIL.png',
+    bula: {
+      indicacao: 'pressão alta, insuficiência cardíaca e proteção dos rins em diabéticos.',
+      acao: 'dilata os vasos sanguíneos, reduzindo a pressão arterial.',
+      uso: 'via oral, conforme prescrição médica.',
+      efeitos: 'tosse seca, tontura, dor de cabeça e pressão baixa.',
+      contraindicacao: 'gravidez, alergia ao medicamento e histórico de angioedema.',
+    },
+  },
+  {
+    nome: 'Insulina NPH',
+    dosePadrao: '',
+    imagem: '/INSULINA_NPH.png',
+    bula: {
+      indicacao: 'tratamento do diabetes tipo 1 e tipo 2.',
+      acao: 'controla os níveis de glicose (açúcar) no sangue.',
+      inicioAcao: 'cerca de 1 a 2 horas após a aplicação.',
+      duracao: 'aproximadamente 12 a 18 horas.',
+      uso: 'aplicada por via subcutânea (sob a pele).',
+      efeitos: 'hipoglicemia, vermelhidão ou dor no local da aplicação.',
+      cuidados: 'armazenar refrigerada e agitar suavemente antes do uso.',
     },
   },
   {
